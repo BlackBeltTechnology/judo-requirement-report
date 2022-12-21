@@ -12,12 +12,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
 
 @SupportedAnnotationTypes(
-        {"hu.blackbelt.judo.requirement.report.annotation.Requirement",
-        "org.junit.jupiter.api.Test"}
+        "hu.blackbelt.judo.requirement.report.annotation.Requirement"
 )
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
@@ -53,7 +51,9 @@ public class RequirementProcessor extends AbstractProcessor {
     }
 
     private void writeCsv(File file, Collection<Info> infos) {
-        file.mkdirs();
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
         try (PrintWriter out = new PrintWriter(file)) {
             // file header
             out.println("TEST METHOD;STATUS;REQUIREMENTS");
@@ -72,33 +72,27 @@ public class RequirementProcessor extends AbstractProcessor {
                 && testAnnotation != null
         ) {
             // everything is OK
-            return processRequrementAnnotation(reqAnnotation, elementName, "OK");
+            return processRequirementAnnotation(reqAnnotation, elementName, "OK");
         }
         else if (reqAnnotation != null
                 && reqAnnotation.reqs().length == 0
                 && testAnnotation != null
         ) {
             // There isn't any requirement id.
-            return processRequrementAnnotation(reqAnnotation, elementName, "There isn't any requirement id.");
+            return processRequirementAnnotation(reqAnnotation, elementName, "There isn't any requirement id.");
         }
         else if ( reqAnnotation != null
             //&& testAnnotation == null
         ) {
             // Missing annotation: @Test.
-            return processRequrementAnnotation(reqAnnotation, elementName, "Missing annotation: @Test.");
-        }
-        else if ( testAnnotation != null
-            //&& reqAnnotation == null
-        ) {
-            // Missing annotation: @Requirement.
-            return processRequrementAnnotation(reqAnnotation, elementName, "Missing annotation: @Requirement.");
+            return processRequirementAnnotation(reqAnnotation, elementName, "Missing annotation: @Test.");
         }
         else {
             throw new RuntimeException("There is a big problem. We should not be here.");
         }
     }
 
-    private Collection<Info> processRequrementAnnotation(Requirement reqAnnotation, String elementName, String status) {
+    private Collection<Info> processRequirementAnnotation(Requirement reqAnnotation, String elementName, String status) {
         if (reqAnnotation != null && reqAnnotation.reqs().length > 0) {
             return Arrays.stream(reqAnnotation.reqs()).map(a -> new Info(elementName, status, a)).collect(Collectors.toSet());
         } else {
