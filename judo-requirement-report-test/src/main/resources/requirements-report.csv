@@ -1,0 +1,10 @@
+TEST METHOD;STATUS;REQUIREMENTS
+TestRequirementProcessor.test00;There isn't any requirement id.;
+TestRequirementProcessor.test01;OK;R01
+TestRequirementProcessor.test02;OK;R02
+TestRequirementProcessor.test03;OK;R01
+TestRequirementProcessor.test03;OK;R03
+TestRequirementProcessor.test04;OK;R04
+TestRequirementProcessor.test04;OK;R05
+TestRequirementProcessor.test05;Missing annotation: @Test.;R01
+TestRequirementProcessor.test05;Missing annotation: @Test.;R03
