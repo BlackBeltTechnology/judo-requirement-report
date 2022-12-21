@@ -51,16 +51,21 @@ public class RequirementProcessor extends AbstractProcessor {
     }
 
     private void writeCsv(File file, Collection<Info> infos) {
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+
+        if (file.getParentFile().mkdirs()) {
+            try (PrintWriter out = new PrintWriter(file)) {
+                // file header
+                out.println("TEST METHOD;STATUS;REQUIREMENTS");
+                infos.forEach(i -> out.println(i.toLine()));
+            } catch (IOException e) {
+                throw new RuntimeException("RequirementProcessor error", e);
+            }
+        } else {
+            throw new RuntimeException(
+                    "RequirementProcessor error: Can't create this directory: " + file.getParentFile().getName()
+            );
         }
-        try (PrintWriter out = new PrintWriter(file)) {
-            // file header
-            out.println("TEST METHOD;STATUS;REQUIREMENTS");
-            infos.forEach(i -> out.println(i.toLine()));
-        } catch (IOException e) {
-            throw new RuntimeException("RequirementProcessor error", e);
-        }
+
     }
 
     private Collection<Info> collectReqForElement(Element element) {
