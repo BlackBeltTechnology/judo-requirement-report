@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>hu.blackbelt.judo</groupId>
+        <artifactId>judo-requirement-report</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>judo-requirement-report-processor</artifactId>
+    <name>JUDO Requirement :: Report :: Processor</name>
+    <description>JUDO Requirement processor</description>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>hu.blackbelt.judo</groupId>
+            <artifactId>judo-requirement-report-annotation</artifactId>
+        </dependency>
+    </dependencies>
+</project>
