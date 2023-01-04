@@ -24,6 +24,8 @@ import hu.blackbelt.judo.requirement.report.annotation.Requirement;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @Slf4j
 public class TestRequirementProcessor {
 
@@ -32,7 +34,7 @@ public class TestRequirementProcessor {
     })
     @Test
     public void test00(){
-
+        assertTrue(true);
     }
 
     @Requirement(reqs = {
@@ -40,7 +42,7 @@ public class TestRequirementProcessor {
     })
     @Test
     public void test01(){
-
+        assertTrue(true);
     }
 
     @Requirement(reqs = {
@@ -48,7 +50,7 @@ public class TestRequirementProcessor {
     })
     @Test
     public void test02(){
-
+        assertTrue(true);
     }
 
     @Requirement(reqs = {
@@ -57,7 +59,7 @@ public class TestRequirementProcessor {
     })
     @Test
     public void test03(){
-
+        assertTrue(true);
     }
 
     @Requirement(reqs = {
@@ -66,7 +68,7 @@ public class TestRequirementProcessor {
     })
     @Test
     public void test04(){
-
+        assertTrue(true);
     }
 
     @Requirement(reqs = {
@@ -74,11 +76,11 @@ public class TestRequirementProcessor {
             "R03"
     })
     public void test05(){
-
+        assertTrue(true);
     }
 
     @Test
     public void testReal(){
-
+        assertTrue(false);
     }
 }
