@@ -80,7 +80,7 @@ public class RequirementProcessor extends AbstractProcessor {
 
         try (PrintWriter out = new PrintWriter(file)) {
             // file header
-            out.println("TEST METHOD;STATUS;REQUIREMENTS");
+            out.println("TEST METHOD;STATUS;REQUIREMENT");
             infos.forEach(i -> out.println(i.toLine()));
         } catch (IOException e) {
             throw new RuntimeException("RequirementProcessor error", e);
