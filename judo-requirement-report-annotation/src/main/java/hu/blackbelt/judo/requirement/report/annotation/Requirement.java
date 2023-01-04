@@ -2,9 +2,9 @@ package hu.blackbelt.judo.requirement.report.annotation;
 
 /*-
  * #%L
- * JUDO Runtime Core JSL :: Parent
+ * JUDO Requirement :: Report :: Annotation
  * %%
- * Copyright (C) 2018 - 2022 BlackBelt Technology
+ * Copyright (C) 2018 - 2023 BlackBelt Technology
  * %%
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at

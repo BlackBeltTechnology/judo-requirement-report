@@ -1,5 +1,25 @@
 package hu.blackbelt.judo.requirement.report.processor;
 
+/*-
+ * #%L
+ * JUDO Requirement :: Report :: Processor
+ * %%
+ * Copyright (C) 2018 - 2023 BlackBelt Technology
+ * %%
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ * 
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
+ * 
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ * #L%
+ */
+
 import com.google.auto.service.AutoService;
 import org.junit.jupiter.api.Test;
 import javax.annotation.processing.*;
@@ -51,21 +71,20 @@ public class RequirementProcessor extends AbstractProcessor {
     }
 
     private void writeCsv(File file, Collection<Info> infos) {
-
-        if (file.getParentFile().mkdirs()) {
-            try (PrintWriter out = new PrintWriter(file)) {
-                // file header
-                out.println("TEST METHOD;STATUS;REQUIREMENTS");
-                infos.forEach(i -> out.println(i.toLine()));
-            } catch (IOException e) {
-                throw new RuntimeException("RequirementProcessor error", e);
-            }
-        } else {
+        try {
+            file.getParentFile().mkdirs();
+        } catch (Exception e) {
             throw new RuntimeException(
-                    "RequirementProcessor error: Can't create this directory: " + file.getParentFile().getName()
-            );
+                    "RequirementProcessor error: Can't create this directory: " + file.getParentFile().getAbsolutePath());
         }
 
+        try (PrintWriter out = new PrintWriter(file)) {
+            // file header
+            out.println("TEST METHOD;STATUS;REQUIREMENTS");
+            infos.forEach(i -> out.println(i.toLine()));
+        } catch (IOException e) {
+            throw new RuntimeException("RequirementProcessor error", e);
+        }
     }
 
     private Collection<Info> collectReqForElement(Element element) {
