@@ -21,6 +21,7 @@ package hu.blackbelt.judo.requirement.report.processor;
  */
 
 import com.google.auto.service.AutoService;
+import com.opencsv.*;
 import org.junit.jupiter.api.Test;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -28,8 +29,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
@@ -78,10 +79,18 @@ public class RequirementProcessor extends AbstractProcessor {
                     "RequirementProcessor error: Can't create this directory: " + file.getParentFile().getAbsolutePath());
         }
 
-        try (PrintWriter out = new PrintWriter(file)) {
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(';')
+                .withIgnoreQuotations(true)
+                .build();
+
+        try (ICSVWriter out = new CSVWriterBuilder(new FileWriter(file))
+                .withParser(parser)
+                .build()
+        ) {
             // file header
-            out.println("TEST METHOD;STATUS;REQUIREMENT");
-            infos.forEach(i -> out.println(i.toLine()));
+            out.writeNext(new String[]{"TEST METHOD","STATUS","REQUIREMENT"});
+            infos.forEach(i -> out.writeNext(i.toStringArray()));
         } catch (IOException e) {
             throw new RuntimeException("RequirementProcessor error", e);
         }
@@ -135,8 +144,8 @@ public class RequirementProcessor extends AbstractProcessor {
             this.reqId = reqId;
         }
 
-        String toLine() {
-            return testMethod + ";" + status + ";" + (reqId == null ? "" : reqId);
+        String[] toStringArray() {
+            return new String[]{testMethod, status, (reqId == null ? "" : reqId)};
         }
     }
 }

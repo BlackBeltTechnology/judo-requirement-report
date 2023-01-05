@@ -147,6 +147,12 @@
             <version>0.22.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.7.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -240,6 +246,7 @@
                         <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
                             <logback.configurationFile>${logback-test-config}</logback.configurationFile>
+                            <reportPath>${project.basedir}/target/classes/requirements-report.csv</reportPath>
                         </systemPropertyVariables>
                         <!--suppress UnresolvedMavenProperty -->
                         <argLine>
