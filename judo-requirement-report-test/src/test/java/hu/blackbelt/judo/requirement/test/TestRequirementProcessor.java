@@ -26,16 +26,12 @@ import com.opencsv.CSVReaderBuilder;
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import com.opencsv.CSVReader;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
@@ -100,107 +96,78 @@ public class TestRequirementProcessor {
      * This is the real test case.
      */
     public void testReal(){
-        // Create Reference Array
-        List<String[]> refTable = createRefTable();
-
         // Read generated csv
         List<String[]> table = readCsv(System.getProperty("reportPath"));
 
-        // Check the lists
-        assertArrayEquals(refTable.toArray(), table.toArray());
-    }
+        // Check the size of csv
+        assertThat(table.size(), greaterThanOrEqualTo(1));
 
-    private List<String[]> createRefTable() {
-        List<String[]> refTable = new LinkedList<>();
-        refTable.add(
-                new String[]{
-                        "TEST METHOD",
-                        "STATUS",
-                        "REQUIREMENT"
-                }
+        // First row
+        assertThat(
+                table.get(0),
+                is(array(
+                        equalTo("TEST METHOD"),
+                        equalTo("STATUS"),
+                        equalTo("REQUIREMENT")
+                ))
         );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test05",
-                        "Missing annotation: @Test.",
-                        "R03"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test03",
-                        "OK",
-                        "R03"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test03",
-                        "OK",
-                        "R01"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test00",
-                        "There isn't any requirement id.",
-                        ""
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test04",
-                        "OK",
-                        "R04"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test02",
-                        "OK",
-                        "R02"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test01",
-                        "OK",
-                        "R01"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test04",
-                        "OK",
-                        "R05"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test05",
-                        "Missing annotation: @Test.",
-                        "R01"
-                }
-        );
-        refTable.add(
-                new String[]{
-                        "TestRequirementProcessor.test04",
-                        "OK",
-                        "R01"
-                }
-        );
-//        refTable.add(
-//                new String[]{
-//                        "",
-//                        "",
-//                        ""
-//                }
-//        );
 
-        return refTable
-                .stream()
-                .sorted(new RowComparator())
-                .collect(Collectors.toList());
+        //Other rows
+        assertThat(
+                table.subList(1, table.size()),
+                containsInAnyOrder(
+                        is(array(
+                                equalTo("TestRequirementProcessor.test05"),
+                                equalTo("Missing annotation: @Test."),
+                                equalTo("R03")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test03"),
+                                equalTo("OK"),
+                                equalTo("R03")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test03"),
+                                equalTo("OK"),
+                                equalTo("R01")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test00"),
+                                equalTo("There isn't any requirement id."),
+                                equalTo("")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("OK"),
+                                equalTo("R04")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test02"),
+                                equalTo("OK"),
+                                equalTo("R02")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test01"),
+                                equalTo("OK"),
+                                equalTo("R01")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("OK"),
+                                equalTo("R05")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test05"),
+                                equalTo("Missing annotation: @Test."),
+                                equalTo("R01")
+                        )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("OK"),
+                                equalTo("R01")
+                        ))
+                )
+        );
     }
 
     private List<String[]> readCsv(String filePath) {
@@ -213,26 +180,11 @@ public class TestRequirementProcessor {
                 .withCSVParser(parser)
                 .build();
         ) {
-            return csvReader.readAll()
-                    .stream()
-                    .sorted(new RowComparator())
-                    .collect(Collectors.toList());
+            return csvReader.readAll();
         }
         catch(Exception e) {
             throw new RuntimeException(
                     "TestRequirementProcessor error: Can't read this file: " + filePath);
-        }
-    }
-
-    private class RowComparator implements Comparator<String[]> {
-        // Order rows of csv by TEST METHOD, REQUIREMENT
-        public int compare(String[] a, String[] b) {
-            int result = a[0].compareTo(b[0]);
-            if(result == 0) {
-                result = a[2].compareTo(b[2]);
-            }
-
-            return result;
         }
     }
 }
