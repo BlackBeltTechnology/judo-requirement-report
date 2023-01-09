@@ -96,13 +96,13 @@ public class TestRequirementProcessor {
      * This is the real test case.
      */
     public void testReal(){
-        // Read generated csv
+        // Reading the generated csv
         List<String[]> table = readCsv(System.getProperty("reportPath"));
 
-        // Check the size of csv
+        // Checking the size of the csv
         assertThat(table.size(), greaterThanOrEqualTo(1));
 
-        // First row
+        // First row of the csv
         assertThat(
                 table.get(0),
                 is(array(
@@ -112,7 +112,7 @@ public class TestRequirementProcessor {
                 ))
         );
 
-        //Other rows
+        //Other rows of the csv
         assertThat(
                 table.subList(1, table.size()),
                 containsInAnyOrder(
