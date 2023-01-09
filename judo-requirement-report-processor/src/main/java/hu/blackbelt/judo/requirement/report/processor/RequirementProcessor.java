@@ -76,7 +76,10 @@ public class RequirementProcessor extends AbstractProcessor {
             file.getParentFile().mkdirs();
         } catch (Exception e) {
             throw new RuntimeException(
-                    "RequirementProcessor error: Can't create this directory: " + file.getParentFile().getAbsolutePath());
+                    "RequirementProcessor error: Can't create this directory: " +
+                            file.getParentFile().getAbsolutePath()
+                    ,e
+            );
         }
 
         CSVParser parser = new CSVParserBuilder()
@@ -115,7 +118,6 @@ public class RequirementProcessor extends AbstractProcessor {
             return processRequirementAnnotation(reqAnnotation, elementName, "There isn't any requirement id.");
         }
         else if ( reqAnnotation != null
-            //&& testAnnotation == null
         ) {
             // Missing annotation: @Test.
             return processRequirementAnnotation(reqAnnotation, elementName, "Missing annotation: @Test.");

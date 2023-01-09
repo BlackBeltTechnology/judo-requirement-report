@@ -226,11 +226,11 @@ public class TestRequirementProcessor {
 
     private class RowComparator implements Comparator<String[]> {
         // Order rows of csv by TEST METHOD, REQUIREMENT
-        public int compare(String[] a, String[] b)
-        {
+        public int compare(String[] a, String[] b) {
             int result = a[0].compareTo(b[0]);
-            if(result == 0)
+            if(result == 0) {
                 result = a[2].compareTo(b[2]);
+            }
 
             return result;
         }
