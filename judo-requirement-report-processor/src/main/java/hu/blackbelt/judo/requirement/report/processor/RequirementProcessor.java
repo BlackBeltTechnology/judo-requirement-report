@@ -77,8 +77,8 @@ public class RequirementProcessor extends AbstractProcessor {
         } catch (Exception e) {
             throw new RuntimeException(
                     "RequirementProcessor error: Can't create this directory: " +
-                            file.getParentFile().getAbsolutePath()
-                    ,e
+                            file.getParentFile().getAbsolutePath(),
+                    e
             );
         }
 
