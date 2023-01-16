@@ -98,7 +98,7 @@ public class TestRequirementProcessor {
             "R01",
             "R03"
     })
-    /**
+    /*
      * This is not a real test. Therefore, it isn't used the @Test annotation.
      */
     public void test05(){
@@ -107,7 +107,7 @@ public class TestRequirementProcessor {
 
 
     @Test
-    /**
+    /*
      * This case verifies that the RequirementProcessor.processor() operation checking the existing of the reportPath option.
      */
     public void testReal01(){
@@ -209,7 +209,7 @@ public class TestRequirementProcessor {
     }
 
     @Test
-    /**
+    /*
      * This is the real test case. This case checks the generated csv.
      */
     public void testReal02(){
@@ -299,7 +299,7 @@ public class TestRequirementProcessor {
 
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath))
                 .withCSVParser(parser)
-                .build();
+                .build()
         ) {
             return csvReader.readAll();
         }
