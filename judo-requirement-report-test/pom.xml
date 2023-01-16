@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>hu.blackbelt.judo</groupId>
+        <artifactId>judo-requirement-report</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>judo-requirement-report-test</artifactId>
+    <name>JUDO Requirement :: Report :: Test</name>
+    <description>JUDO Requirement test</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>hu.blackbelt.judo</groupId>
+            <artifactId>judo-requirement-report-processor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-AreportPath=${project.basedir}/target/classes/requirements-report.csv</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <!-- The value of this property has to be the same as reportPath compiler argument. -->
+                            <reportPath>${project.basedir}/target/classes/requirements-report.csv</reportPath>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
