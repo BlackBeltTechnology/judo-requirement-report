@@ -46,6 +46,22 @@ public class RequirementProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        String reportPath = processingEnv.getOptions().get("reportPath");
+        if (reportPath == null || "".equals(reportPath)) {
+            throw new RuntimeException(
+                    "The maven-compiler-plugin doesn't have \"reportPath\" compilerArgs. Add this to the pom.xml.\n" +
+                            "<plugin>\n" +
+                            "    <groupId>org.apache.maven.plugins</groupId>\n" +
+                            "    <artifactId>maven-compiler-plugin</artifactId>\n" +
+                            "    <configuration>\n" +
+                            "        <compilerArgs>\n" +
+                            "            <arg>-AreportPath=${project.basedir}/target/classes/requirements-report.csv</arg>\n" +
+                            "        </compilerArgs>\n" +
+                            "    </configuration>\n" +
+                            "</plugin>"
+            );
+        }
+
         processingEnv.getMessager().printMessage(
                 Diagnostic.Kind.NOTE,
                 "RequirementProcessor start."
@@ -62,7 +78,7 @@ public class RequirementProcessor extends AbstractProcessor {
                 .flatMap(e -> collectReqForElement(e).stream())
                 .collect(Collectors.toSet());
 
-        writeCsv(new File(processingEnv.getOptions().get("reportPath")), infos);
+        writeCsv(new File(reportPath), infos);
 
         processingEnv.getMessager().printMessage(
                 Diagnostic.Kind.NOTE,

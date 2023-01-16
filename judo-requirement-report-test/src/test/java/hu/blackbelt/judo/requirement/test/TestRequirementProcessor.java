@@ -24,11 +24,25 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
+import hu.blackbelt.judo.requirement.report.processor.RequirementProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import java.io.FileReader;
-import java.util.List;
+import java.lang.annotation.Annotation;
+import java.util.*;
 import com.opencsv.CSVReader;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -91,13 +105,120 @@ public class TestRequirementProcessor {
         assertTrue(false);
     }
 
+
     @Test
     /**
-     * This is the real test case.
+     * This case verifies that the RequirementProcessor.processor() operation checking the existing of the reportPath option.
      */
-    public void testReal(){
+    public void testReal01(){
+        // Create a dummy RequirementProcessor
+        RequirementProcessor rp = new RequirementProcessor();
+
+        // Initialize the dummy processor
+        rp.init(
+                new ProcessingEnvironment() {
+                    @Override
+                    public Map<String, String> getOptions() {
+                        return new HashMap<>();
+                    }
+
+                    @Override
+                    public Messager getMessager() {
+                        return new Messager() {
+                            @Override
+                            public void printMessage(Diagnostic.Kind kind, CharSequence msg) {
+                            }
+
+                            @Override
+                            public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e) {
+                            }
+
+                            @Override
+                            public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a) {
+                            }
+
+                            @Override
+                            public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a, AnnotationValue v) {
+                            }
+                        };
+                    }
+
+                    @Override
+                    public Filer getFiler() {
+                        return null;
+                    }
+
+                    @Override
+                    public Elements getElementUtils() {
+                        return null;
+                    }
+
+                    @Override
+                    public Types getTypeUtils() {
+                        return null;
+                    }
+
+                    @Override
+                    public SourceVersion getSourceVersion() {
+                        return null;
+                    }
+
+                    @Override
+                    public Locale getLocale() {
+                        return null;
+                    }
+                }
+        );
+
+        // start the process method
+        RuntimeException error = assertThrows(
+                RuntimeException.class,
+                () -> rp.process(
+                        Set.of(new TypeElement[]{}),
+                        new RoundEnvironment() {
+                            @Override
+                            public boolean processingOver() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean errorRaised() {
+                                return false;
+                            }
+
+                            @Override
+                            public Set<? extends Element> getRootElements() {
+                                return Set.of(new Element[]{});
+                            }
+
+                            @Override
+                            public Set<? extends Element> getElementsAnnotatedWith(TypeElement a) {
+                                return Set.of(new Element[]{});
+                            }
+
+                            @Override
+                            public Set<? extends Element> getElementsAnnotatedWith(Class<? extends Annotation> a) {
+                                return Set.of(new Element[]{});
+                            }
+                        }
+                        )
+        );
+
+        assertNotNull(error);
+        assertThat(error.getMessage(), startsWith("The maven-compiler-plugin doesn't have \"reportPath\" compilerArgs."));
+    }
+
+    @Test
+    /**
+     * This is the real test case. This case checks the generated csv.
+     */
+    public void testReal02(){
+        String reportPath = System.getProperty("reportPath");
+        // The value of this property has to be the same as reportPath compiler argument.
+        assertNotNull(reportPath, "The reportPath system variable must be set.");
+
         // Reading the generated csv
-        List<String[]> table = readCsv(System.getProperty("reportPath"));
+        List<String[]> table = readCsv(reportPath);
 
         // Checking the size of the csv
         assertThat(table.size(), greaterThanOrEqualTo(1));
