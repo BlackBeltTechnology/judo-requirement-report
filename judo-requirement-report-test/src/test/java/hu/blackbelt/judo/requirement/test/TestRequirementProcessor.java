@@ -205,7 +205,7 @@ public class TestRequirementProcessor {
         );
 
         assertNotNull(error);
-        assertThat(error.getMessage(), startsWith("The maven-compiler-plugin doesn't have \"reportPath\" compilerArgs."));
+        assertEquals(RequirementProcessor.ERROR_MSG_NO_REPORT_PATH, error.getMessage());
     }
 
     @Test

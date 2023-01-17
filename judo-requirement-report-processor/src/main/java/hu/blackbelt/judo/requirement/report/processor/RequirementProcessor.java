@@ -42,24 +42,25 @@ import hu.blackbelt.judo.requirement.report.annotation.Requirement;
 @AutoService(Processor.class)
 public class RequirementProcessor extends AbstractProcessor {
 
+    public static final String ERROR_MSG_NO_REPORT_PATH =
+            "The maven-compiler-plugin doesn't have \"reportPath\" compilerArgs. Add this to the pom.xml.\n" +
+            "<plugin>\n" +
+            "    <groupId>org.apache.maven.plugins</groupId>\n" +
+            "    <artifactId>maven-compiler-plugin</artifactId>\n" +
+            "    <configuration>\n" +
+            "        <compilerArgs>\n" +
+            "            <arg>-AreportPath=${project.basedir}/target/classes/requirements-report.csv</arg>\n" +
+            "        </compilerArgs>\n" +
+            "    </configuration>\n" +
+            "</plugin>";
+
     public RequirementProcessor(){}
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         String reportPath = processingEnv.getOptions().get("reportPath");
-        if (reportPath == null || "".equals(reportPath)) {
-            throw new RuntimeException(
-                    "The maven-compiler-plugin doesn't have \"reportPath\" compilerArgs. Add this to the pom.xml.\n" +
-                            "<plugin>\n" +
-                            "    <groupId>org.apache.maven.plugins</groupId>\n" +
-                            "    <artifactId>maven-compiler-plugin</artifactId>\n" +
-                            "    <configuration>\n" +
-                            "        <compilerArgs>\n" +
-                            "            <arg>-AreportPath=${project.basedir}/target/classes/requirements-report.csv</arg>\n" +
-                            "        </compilerArgs>\n" +
-                            "    </configuration>\n" +
-                            "</plugin>"
-            );
+        if (reportPath == null || reportPath.isBlank()) {
+            throw new RuntimeException(ERROR_MSG_NO_REPORT_PATH);
         }
 
         processingEnv.getMessager().printMessage(
