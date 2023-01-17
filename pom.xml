@@ -246,7 +246,6 @@
                         <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
                             <logback.configurationFile>${logback-test-config}</logback.configurationFile>
-                            <reportPath>${project.basedir}/target/classes/requirements-report.csv</reportPath>
                         </systemPropertyVariables>
                         <!--suppress UnresolvedMavenProperty -->
                         <argLine>
