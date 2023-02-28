@@ -24,6 +24,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
+import hu.blackbelt.judo.requirement.report.annotation.TestCase;
 import hu.blackbelt.judo.requirement.report.processor.RequirementProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,7 @@ public class TestRequirementProcessor {
     @Requirement(reqs = {
 
     })
+    @TestCase("")
     @Test
     public void test00(){
         assertTrue(true);
@@ -70,6 +72,7 @@ public class TestRequirementProcessor {
     @Requirement(reqs = {
             "R02"
     })
+    @TestCase("TC01")
     @Test
     public void test02(){
         assertTrue(true);
@@ -79,6 +82,7 @@ public class TestRequirementProcessor {
             "R01",
             "R03"
     })
+    @TestCase("TC03")
     @Test
     public void test03(){
         assertTrue(true);
@@ -89,6 +93,7 @@ public class TestRequirementProcessor {
             "R04",
             "R01"
     })
+    @TestCase("TC02")
     @Test
     public void test04(){
         assertTrue(true);
@@ -98,6 +103,7 @@ public class TestRequirementProcessor {
             "R01",
             "R03"
     })
+    @TestCase("TC04")
     /*
      * This is not a real test. Therefore, it isn't used the @Test annotation.
      */
