@@ -22,6 +22,7 @@ package hu.blackbelt.judo.requirement.report.processor;
 
 import com.google.auto.service.AutoService;
 import com.opencsv.*;
+
 import org.junit.jupiter.api.Test;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -33,11 +34,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import hu.blackbelt.judo.requirement.report.annotation.Requirement;
+import java.util.stream.Stream;
 
-@SupportedAnnotationTypes(
-        "hu.blackbelt.judo.requirement.report.annotation.Requirement"
-)
+import hu.blackbelt.judo.requirement.report.annotation.Requirement;
+import hu.blackbelt.judo.requirement.report.annotation.TestCase;
+
+@SupportedAnnotationTypes({
+    "hu.blackbelt.judo.requirement.report.annotation.Requirement",
+    "hu.blackbelt.judo.requirement.report.annotation.TestCase"
+})
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class RequirementProcessor extends AbstractProcessor {
@@ -54,6 +59,9 @@ public class RequirementProcessor extends AbstractProcessor {
             "    </configuration>\n" +
             "</plugin>";
 
+    public static final String REQUIREMENT_REPORT_CSV = "requirements-report.csv";
+    public static final String TEST_CASE_REPORT_CSV = "testcase-report.csv";
+            
     public RequirementProcessor(){}
 
     @Override
@@ -61,6 +69,17 @@ public class RequirementProcessor extends AbstractProcessor {
         String reportPath = processingEnv.getOptions().get("reportPath");
         if (reportPath == null || reportPath.isBlank()) {
             throw new RuntimeException(ERROR_MSG_NO_REPORT_PATH);
+        }
+        
+        String fileNameOfReqReportCsv = null;
+        String fileNameOfTestCasesCsv = null;
+        
+        if (reportPath.endsWith("/")) {
+            fileNameOfReqReportCsv = reportPath + REQUIREMENT_REPORT_CSV;
+            fileNameOfTestCasesCsv = reportPath + TEST_CASE_REPORT_CSV;
+        } else {
+            fileNameOfReqReportCsv = reportPath + "/" + REQUIREMENT_REPORT_CSV;
+            fileNameOfTestCasesCsv = reportPath + "/" + TEST_CASE_REPORT_CSV;
         }
 
         processingEnv.getMessager().printMessage(
@@ -71,15 +90,63 @@ public class RequirementProcessor extends AbstractProcessor {
         if (annotations.isEmpty()) {
             return false;
         }
-
-        // Annotation[] -> Element[] -> Info[]
-        Collection<Info> infos = annotations.stream()
+        
+        // Annotation[] -> Element[] -> AnnotatedElement[]
+        List<AnnotatedElement> annotatedMethods = annotations.stream()
                 .flatMap(a -> roundEnv.getElementsAnnotatedWith(a).stream())
+                // filter the duplications
                 .collect(Collectors.toSet()).stream()
-                .flatMap(e -> collectReqForElement(e).stream())
-                .collect(Collectors.toSet());
+                .map(a -> new AnnotatedElement(a))
+                // sort by test case id
+                .sorted()
+                .collect(Collectors.toList());
+                
+        // check ids of all test case are unique
+        AnnotatedElement prevAe = null;
+        Set<AnnotatedElement> wrongTCs= new HashSet<AnnotatedElement>();
+        for (AnnotatedElement ae : annotatedMethods) {
+            if (prevAe != null) {
+                if (!(ae.getTestCaseId().equals("")) && ae.getTestCaseId().equals(prevAe.getTestCaseId())) {
+                    // This TestCaseId isn't unique
+                    wrongTCs.add(prevAe);
+                    wrongTCs.add(ae);
+                } else {
+                    // update the result string of wrongTCs
+                    wrongTCs.stream()
+                        .forEach(
+                                tc ->
+                                tc.addResultStringForTestCaseReport(
+                                        "Test case id isn't unique. It is used by " +
+                                                wrongTCs
+                                                .stream()
+                                                // remove tc from the list.
+                                                .filter(
+                                                        tca ->
+                                                        !(tca.getElementName().equals(tc.getElementName()))
+                                                       )
+                                                .sorted()
+                                                .map(tcb -> tcb.getElementName())
+                                                .collect(Collectors.joining(", "))
+                                )
+                        );
+                    
+                    // clear the wrongTCs
+                    wrongTCs.clear();
+                }
+            }
+            prevAe = ae;
+        }
+        
+        // create the list of test-cases
+        writeTestCases(new File(fileNameOfTestCasesCsv), annotatedMethods.stream());
 
-        writeCsv(new File(reportPath), infos);
+        // create the requirements-report
+        writeRequirementReportCsv(
+                new File(fileNameOfReqReportCsv),
+                annotatedMethods
+                    .stream()
+                    .flatMap(e -> collectReqForElement(e).stream())
+        );
 
         processingEnv.getMessager().printMessage(
                 Diagnostic.Kind.NOTE,
@@ -87,17 +154,41 @@ public class RequirementProcessor extends AbstractProcessor {
         );
         return false;
     }
+    
+    private Collection<Info> collectReqForElement(AnnotatedElement e) {
+        return Arrays.stream(
+                    (e.getReqAnnotation().reqs() == null || e.getReqAnnotation().reqs().length == 0) ?
+                            new String[]{""}
+                            : e.getReqAnnotation().reqs()
+                )
+                .map(a -> new Info(e.getElementName(), e.getTestCaseId(), e.getResultStringForRequirementReport(), a))
+                .collect(Collectors.toSet());
+    }
 
-    private void writeCsv(File file, Collection<Info> infos) {
-        try {
-            file.getParentFile().mkdirs();
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "RequirementProcessor error: Can't create this directory: " +
-                            file.getParentFile().getAbsolutePath(),
-                    e
-            );
+    private void writeTestCases(File file, Stream<AnnotatedElement> elements) {
+        chkDirectory(file);
+        
+        CSVParser parser = new CSVParserBuilder()
+                .withSeparator(';')
+                .withIgnoreQuotations(true)
+                .build();
+
+        try (ICSVWriter out = new CSVWriterBuilder(new FileWriter(file))
+                .withParser(parser)
+                .build()
+        ) {
+            // file header
+            out.writeNext(new String[]{"TEST CASE ID", "TEST METHOD", "STATUS"});
+            
+            // write rows
+            elements.forEach(i -> out.writeNext(i.toTestCaseRowStringArray()));
+        } catch (IOException e) {
+            throw new RuntimeException("RequirementProcessor error", e);
         }
+    }
+
+    private void writeRequirementReportCsv(File file, Stream<Info> elements) {
+        chkDirectory(file);
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
@@ -109,62 +200,146 @@ public class RequirementProcessor extends AbstractProcessor {
                 .build()
         ) {
             // file header
-            out.writeNext(new String[]{"TEST METHOD","STATUS","REQUIREMENT"});
-            infos.forEach(i -> out.writeNext(i.toStringArray()));
+            out.writeNext(new String[]{"TEST METHOD","TEST CASE ID","STATUS","REQUIREMENT"});
+            
+            // write rows
+            elements.forEach(i -> out.writeNext(i.toRequirementReportRowStringArray()));
         } catch (IOException e) {
             throw new RuntimeException("RequirementProcessor error", e);
         }
     }
 
-    private Collection<Info> collectReqForElement(Element element) {
-        Requirement reqAnnotation = element.getAnnotation(Requirement.class);
-        Test testAnnotation = element.getAnnotation(Test.class);
-        String elementName = element.getEnclosingElement().getSimpleName() + "." + element.getSimpleName();
-        if ( reqAnnotation != null
-                && reqAnnotation.reqs().length > 0
-                && testAnnotation != null
-        ) {
-            // everything is OK
-            return processRequirementAnnotation(reqAnnotation, elementName, "OK");
-        }
-        else if (reqAnnotation != null
-                && reqAnnotation.reqs().length == 0
-                && testAnnotation != null
-        ) {
-            // There isn't any requirement id.
-            return processRequirementAnnotation(reqAnnotation, elementName, "There isn't any requirement id.");
-        }
-        else if ( reqAnnotation != null
-        ) {
-            // Missing annotation: @Test.
-            return processRequirementAnnotation(reqAnnotation, elementName, "Missing annotation: @Test.");
-        }
-        else {
-            throw new RuntimeException("There is a big problem. We should not be here.");
+    private void chkDirectory(File file) {
+        try {
+            file.getParentFile().mkdirs();
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "RequirementProcessor error: Can't create this directory: " +
+                            file.getParentFile().getAbsolutePath(),
+                    e
+            );
         }
     }
 
-    private Collection<Info> processRequirementAnnotation(Requirement reqAnnotation, String elementName, String status) {
-        if (reqAnnotation != null && reqAnnotation.reqs().length > 0) {
-            return Arrays.stream(reqAnnotation.reqs()).map(a -> new Info(elementName, status, a)).collect(Collectors.toSet());
-        } else {
-            return Arrays.asList(new Info(elementName, status, null));
+    /**
+     * This class contains all important meta info of an annotated element.
+     *
+     */
+    private class AnnotatedElement implements Comparable<AnnotatedElement>  {
+        private Element element = null;
+        private String elementName;
+        private boolean isTestCaseAnnotation;
+        private String testCaseId;
+        private boolean isTestAnnotation;
+        private Requirement reqAnnotation;
+        private String resultStringForRequirementReport;
+        private String resultStringForTestCaseReport;
+        
+        public AnnotatedElement(Element element) {
+            this.element = element;
+            this.elementName = element.getEnclosingElement().getSimpleName() + "." + element.getSimpleName();
+            this.reqAnnotation = element.getAnnotation(Requirement.class);
+            this.isTestAnnotation = (element.getAnnotation(Test.class) != null) ? true : false;
+            
+            TestCase testCaseAnnotation = element.getAnnotation(TestCase.class);
+            if (testCaseAnnotation != null) {
+                this.isTestCaseAnnotation = true;
+                if (testCaseAnnotation.value() != null) {
+                    this.testCaseId = testCaseAnnotation.value();
+                    this.resultStringForTestCaseReport = (this.testCaseId.equals("")) ? "Empty string isn't a valid value of a @TestCase annotation." : "OK";
+                } else {
+                    this.testCaseId = "";
+                    this.resultStringForTestCaseReport = "No value of @TestCase annotation.";
+                }
+            } else {
+                this.isTestCaseAnnotation = false;
+                this.testCaseId = "";
+                this.resultStringForTestCaseReport = "Missing annotation: @TestCase.";
+            }
+            
+            if ( reqAnnotation != null
+                    && reqAnnotation.reqs().length > 0
+                    && isTestAnnotation
+            ) {
+                // everything is OK
+                this.resultStringForRequirementReport = "OK";
+            }
+            else if (reqAnnotation != null
+                    && reqAnnotation.reqs().length == 0
+                    && isTestAnnotation
+            ) {
+                // There isn't any requirement id.
+                this.resultStringForRequirementReport = "There isn't any requirement id.";
+            }
+            else if ( reqAnnotation != null
+            ) {
+                // Missing annotation: @Test.
+                this.resultStringForRequirementReport = "Missing annotation: @Test.";
+            }
+            else {
+                throw new RuntimeException("There is a big problem. We should not be here.");
+            }
+
+        }
+        
+        public String getElementName() {
+            return elementName;
+        }
+        
+        public Requirement getReqAnnotation() {
+            return reqAnnotation;
+        }
+        
+        public String getTestCaseId() {
+            return testCaseId;
+        }
+
+        public String getResultStringForRequirementReport() {
+            return resultStringForRequirementReport;
+        }
+
+        @Override
+        public int compareTo(AnnotatedElement arg0) {
+            if (arg0 == null) {
+                throw new RuntimeException("The null value isn't comparable.");
+            }
+            int result = this.testCaseId.compareTo(arg0.testCaseId);
+            if (result == 0) {
+                result = this.elementName.compareTo(arg0.elementName);
+            }
+            return result;
+        }
+        
+        public void addResultStringForTestCaseReport(String resultStringForTestCaseReport) {
+            this.resultStringForTestCaseReport = (this.resultStringForTestCaseReport.equals("OK")) ?
+                    resultStringForTestCaseReport
+                    : this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport;
+        }
+
+        String[] toTestCaseRowStringArray() {
+            return new String[]{
+                    this.testCaseId,
+                    this.elementName,
+                    this.resultStringForTestCaseReport
+                    };
         }
     }
-
+    
     private class Info {
         String testMethod;
         String status;
         String reqId;
+        String testCaseId;
 
-        public Info(String testMethod, String status, String reqId) {
+        public Info(String testMethod, String testCaseId, String status, String reqId) {
             this.testMethod = testMethod;
             this.status = status;
             this.reqId = reqId;
+            this.testCaseId = testCaseId;
         }
 
-        String[] toStringArray() {
-            return new String[]{testMethod, status, (reqId == null ? "" : reqId)};
+        String[] toRequirementReportRowStringArray() {
+            return new String[]{testMethod, testCaseId, status, (reqId == null ? "" : reqId)};
         }
     }
 }
