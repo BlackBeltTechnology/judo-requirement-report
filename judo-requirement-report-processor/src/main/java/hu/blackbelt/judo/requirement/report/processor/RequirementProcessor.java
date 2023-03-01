@@ -54,7 +54,7 @@ public class RequirementProcessor extends AbstractProcessor {
             "</plugin>";
 
     public static final String REQUIREMENT_REPORT_CSV = "requirements-report.csv";
-    public static final String TEST_CASE_REPORT_CSV = "testcase-report.csv";
+    public static final String TEST_CASE_REPORT_CSV = "testcases-report.csv";
             
     public RequirementProcessor(){}
 
@@ -139,7 +139,7 @@ public class RequirementProcessor extends AbstractProcessor {
                 new File(fileNameOfReqReportCsv),
                 annotatedMethods
                     .stream()
-                    .flatMap(e -> collectReqForElement(e).stream())
+                    .flatMap(e -> e.collectReqForElement().stream())
         );
 
         processingEnv.getMessager().printMessage(
@@ -149,16 +149,6 @@ public class RequirementProcessor extends AbstractProcessor {
         return false;
     }
     
-    private Collection<Info> collectReqForElement(AnnotatedElement e) {
-        return Arrays.stream(
-                    (e.getReqAnnotation().reqs() == null || e.getReqAnnotation().reqs().length == 0) ?
-                            new String[]{""}
-                            : e.getReqAnnotation().reqs()
-                )
-                .map(a -> new Info(e.getElementName(), e.getTestCaseId(), e.getResultStringForRequirementReport(), a))
-                .collect(Collectors.toSet());
-    }
-
     private void writeTestCases(File file, Stream<AnnotatedElement> elements) {
         chkDirectory(file);
         
@@ -181,7 +171,7 @@ public class RequirementProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeRequirementReportCsv(File file, Stream<Info> elements) {
+    private void writeRequirementReportCsv(File file, Stream<RequirementReportRow> elements) {
         chkDirectory(file);
 
         CSVParser parser = new CSVParserBuilder()

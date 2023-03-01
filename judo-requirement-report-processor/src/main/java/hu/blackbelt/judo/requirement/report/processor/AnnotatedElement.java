@@ -1,9 +1,11 @@
 package hu.blackbelt.judo.requirement.report.processor;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import javax.lang.model.element.Element;
-
 import org.junit.jupiter.api.Test;
-
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
 import hu.blackbelt.judo.requirement.report.annotation.TestCase;
 
@@ -69,16 +71,8 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
         return elementName;
     }
     
-    public Requirement getReqAnnotation() {
-        return reqAnnotation;
-    }
-    
     public String getTestCaseId() {
         return testCaseId;
-    }
-
-    public String getResultStringForRequirementReport() {
-        return resultStringForRequirementReport;
     }
 
     @Override
@@ -97,6 +91,16 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
         this.resultStringForTestCaseReport = (this.resultStringForTestCaseReport.equals("OK")) ?
                 resultStringForTestCaseReport
                 : this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport;
+    }
+    
+    public Collection<RequirementReportRow> collectReqForElement() {
+        return Arrays.stream(
+                    (this.reqAnnotation.reqs() == null || this.reqAnnotation.reqs().length == 0) ?
+                            new String[]{""}
+                            : this.reqAnnotation.reqs()
+                )
+                .map(a -> new RequirementReportRow(this.elementName, this.testCaseId, this.resultStringForRequirementReport, a))
+                .collect(Collectors.toSet());
     }
 
     String[] toTestCaseRowStringArray() {
