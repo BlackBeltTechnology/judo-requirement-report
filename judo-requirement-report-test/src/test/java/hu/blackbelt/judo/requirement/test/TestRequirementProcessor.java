@@ -233,7 +233,7 @@ public class TestRequirementProcessor {
 
     @Test
     /*
-     * This is the real test case. This case checks the generated requirements-report.csv.
+     * This is a real test case. This case checks the generated requirements-report.csv.
      */
     public void testReal02() {
         String reportPath = System.getProperty("reportPath");
@@ -343,7 +343,7 @@ public class TestRequirementProcessor {
 
     @Test
     /*
-     * This is the real test case. This case checks the generated testcase-report.csv.
+     * This is a real test case. This case checks the generated testcase-report.csv.
      */
     public void testReal03() {
         String reportPath = System.getProperty("reportPath");

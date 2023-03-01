@@ -22,11 +22,8 @@ package hu.blackbelt.judo.requirement.report.processor;
 
 import com.google.auto.service.AutoService;
 import com.opencsv.*;
-
-import org.junit.jupiter.api.Test;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import java.io.File;
@@ -35,9 +32,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import hu.blackbelt.judo.requirement.report.annotation.Requirement;
-import hu.blackbelt.judo.requirement.report.annotation.TestCase;
 
 @SupportedAnnotationTypes({
     "hu.blackbelt.judo.requirement.report.annotation.Requirement",
@@ -218,128 +212,6 @@ public class RequirementProcessor extends AbstractProcessor {
                             file.getParentFile().getAbsolutePath(),
                     e
             );
-        }
-    }
-
-    /**
-     * This class contains all important meta info of an annotated element.
-     *
-     */
-    private class AnnotatedElement implements Comparable<AnnotatedElement>  {
-        private Element element = null;
-        private String elementName;
-        private boolean isTestCaseAnnotation;
-        private String testCaseId;
-        private boolean isTestAnnotation;
-        private Requirement reqAnnotation;
-        private String resultStringForRequirementReport;
-        private String resultStringForTestCaseReport;
-        
-        public AnnotatedElement(Element element) {
-            this.element = element;
-            this.elementName = element.getEnclosingElement().getSimpleName() + "." + element.getSimpleName();
-            this.reqAnnotation = element.getAnnotation(Requirement.class);
-            this.isTestAnnotation = (element.getAnnotation(Test.class) != null) ? true : false;
-            
-            TestCase testCaseAnnotation = element.getAnnotation(TestCase.class);
-            if (testCaseAnnotation != null) {
-                this.isTestCaseAnnotation = true;
-                if (testCaseAnnotation.value() != null) {
-                    this.testCaseId = testCaseAnnotation.value();
-                    this.resultStringForTestCaseReport = (this.testCaseId.equals("")) ? "Empty string isn't a valid value of a @TestCase annotation." : "OK";
-                } else {
-                    this.testCaseId = "";
-                    this.resultStringForTestCaseReport = "No value of @TestCase annotation.";
-                }
-            } else {
-                this.isTestCaseAnnotation = false;
-                this.testCaseId = "";
-                this.resultStringForTestCaseReport = "Missing annotation: @TestCase.";
-            }
-            
-            if ( reqAnnotation != null
-                    && reqAnnotation.reqs().length > 0
-                    && isTestAnnotation
-            ) {
-                // everything is OK
-                this.resultStringForRequirementReport = "OK";
-            }
-            else if (reqAnnotation != null
-                    && reqAnnotation.reqs().length == 0
-                    && isTestAnnotation
-            ) {
-                // There isn't any requirement id.
-                this.resultStringForRequirementReport = "There isn't any requirement id.";
-            }
-            else if ( reqAnnotation != null
-            ) {
-                // Missing annotation: @Test.
-                this.resultStringForRequirementReport = "Missing annotation: @Test.";
-            }
-            else {
-                throw new RuntimeException("There is a big problem. We should not be here.");
-            }
-
-        }
-        
-        public String getElementName() {
-            return elementName;
-        }
-        
-        public Requirement getReqAnnotation() {
-            return reqAnnotation;
-        }
-        
-        public String getTestCaseId() {
-            return testCaseId;
-        }
-
-        public String getResultStringForRequirementReport() {
-            return resultStringForRequirementReport;
-        }
-
-        @Override
-        public int compareTo(AnnotatedElement arg0) {
-            if (arg0 == null) {
-                throw new RuntimeException("The null value isn't comparable.");
-            }
-            int result = this.testCaseId.compareTo(arg0.testCaseId);
-            if (result == 0) {
-                result = this.elementName.compareTo(arg0.elementName);
-            }
-            return result;
-        }
-        
-        public void addResultStringForTestCaseReport(String resultStringForTestCaseReport) {
-            this.resultStringForTestCaseReport = (this.resultStringForTestCaseReport.equals("OK")) ?
-                    resultStringForTestCaseReport
-                    : this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport;
-        }
-
-        String[] toTestCaseRowStringArray() {
-            return new String[]{
-                    this.testCaseId,
-                    this.elementName,
-                    this.resultStringForTestCaseReport
-                    };
-        }
-    }
-    
-    private class Info {
-        String testMethod;
-        String status;
-        String reqId;
-        String testCaseId;
-
-        public Info(String testMethod, String testCaseId, String status, String reqId) {
-            this.testMethod = testMethod;
-            this.status = status;
-            this.reqId = reqId;
-            this.testCaseId = testCaseId;
-        }
-
-        String[] toRequirementReportRowStringArray() {
-            return new String[]{testMethod, testCaseId, status, (reqId == null ? "" : reqId)};
         }
     }
 }
