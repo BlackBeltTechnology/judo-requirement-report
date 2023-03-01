@@ -24,6 +24,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
 import hu.blackbelt.judo.requirement.report.annotation.Requirement;
+import hu.blackbelt.judo.requirement.report.annotation.TestCase;
 import hu.blackbelt.judo.requirement.report.processor.RequirementProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,9 @@ public class TestRequirementProcessor {
     @Requirement(reqs = {
 
     })
+    @TestCase("")
     @Test
-    public void test00(){
+    public void test00() {
         assertTrue(true);
     }
 
@@ -63,15 +65,16 @@ public class TestRequirementProcessor {
             "R01"
     })
     @Test
-    public void test01(){
+    public void test01() {
         assertTrue(true);
     }
 
     @Requirement(reqs = {
             "R02"
     })
+    @TestCase("TC01")
     @Test
-    public void test02(){
+    public void test02() {
         assertTrue(true);
     }
 
@@ -79,8 +82,9 @@ public class TestRequirementProcessor {
             "R01",
             "R03"
     })
+    @TestCase("TC03")
     @Test
-    public void test03(){
+    public void test03() {
         assertTrue(true);
     }
 
@@ -89,8 +93,9 @@ public class TestRequirementProcessor {
             "R04",
             "R01"
     })
+    @TestCase("TC02")
     @Test
-    public void test04(){
+    public void test04() {
         assertTrue(true);
     }
 
@@ -98,19 +103,37 @@ public class TestRequirementProcessor {
             "R01",
             "R03"
     })
+    @TestCase("TC04")
     /*
      * This is not a real test. Therefore, it isn't used the @Test annotation.
      */
-    public void test05(){
+    public void test05() {
         assertTrue(false);
     }
 
+    @Requirement(reqs = {
+            "R99"
+    })
+    @TestCase("TC02")
+    @Test
+    public void test06() {
+        assertTrue(true);
+    }
+    
+    @Requirement(reqs = {
+            "R89"
+    })
+    @TestCase("TC02")
+    @Test
+    public void test07() {
+        assertTrue(true);
+    }
 
     @Test
     /*
      * This case verifies that the RequirementProcessor.processor() operation checking the existing of the reportPath option.
      */
-    public void testReal01(){
+    public void testReal01() {
         // Create a dummy RequirementProcessor
         RequirementProcessor rp = new RequirementProcessor();
 
@@ -210,15 +233,19 @@ public class TestRequirementProcessor {
 
     @Test
     /*
-     * This is the real test case. This case checks the generated csv.
+     * This is a real test case. This case checks the generated requirements-report.csv.
      */
-    public void testReal02(){
+    public void testReal02() {
         String reportPath = System.getProperty("reportPath");
         // The value of this property has to be the same as reportPath compiler argument.
         assertNotNull(reportPath, "The reportPath system variable must be set.");
-
+        
+        String fileNameOfReqReportCsv = (reportPath.endsWith("/")) ?
+                reportPath + RequirementProcessor.REQUIREMENT_REPORT_CSV
+                : reportPath + "/" + RequirementProcessor.REQUIREMENT_REPORT_CSV;
+        
         // Reading the generated csv
-        List<String[]> table = readCsv(reportPath);
+        List<String[]> table = readCsv(fileNameOfReqReportCsv);
 
         // Checking the size of the csv
         assertThat(table.size(), greaterThanOrEqualTo(1));
@@ -228,6 +255,7 @@ public class TestRequirementProcessor {
                 table.get(0),
                 is(array(
                         equalTo("TEST METHOD"),
+                        equalTo("TEST CASE ID"),
                         equalTo("STATUS"),
                         equalTo("REQUIREMENT")
                 ))
@@ -238,59 +266,158 @@ public class TestRequirementProcessor {
                 table.subList(1, table.size()),
                 containsInAnyOrder(
                         is(array(
-                                equalTo("TestRequirementProcessor.test05"),
-                                equalTo("Missing annotation: @Test."),
-                                equalTo("R03")
-                        )),
-                        is(array(
-                                equalTo("TestRequirementProcessor.test03"),
-                                equalTo("OK"),
-                                equalTo("R03")
-                        )),
-                        is(array(
-                                equalTo("TestRequirementProcessor.test03"),
-                                equalTo("OK"),
-                                equalTo("R01")
-                        )),
-                        is(array(
                                 equalTo("TestRequirementProcessor.test00"),
+                                equalTo(""),
                                 equalTo("There isn't any requirement id."),
                                 equalTo("")
-                        )),
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test01"),
+                                equalTo(""),
+                                equalTo("OK"),
+                                equalTo("R01")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test02"),
+                                equalTo("TC01"),
+                                equalTo("OK"),
+                                equalTo("R02")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test03"),
+                                equalTo("TC03"),
+                                equalTo("OK"),
+                                equalTo("R01")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test03"),
+                                equalTo("TC03"),
+                                equalTo("OK"),
+                                equalTo("R03")
+                                )),
                         is(array(
                                 equalTo("TestRequirementProcessor.test04"),
+                                equalTo("TC02"),
+                                equalTo("OK"),
+                                equalTo("R01")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("TC02"),
                                 equalTo("OK"),
                                 equalTo("R04")
                         )),
                         is(array(
-                                equalTo("TestRequirementProcessor.test02"),
-                                equalTo("OK"),
-                                equalTo("R02")
-                        )),
-                        is(array(
-                                equalTo("TestRequirementProcessor.test01"),
-                                equalTo("OK"),
-                                equalTo("R01")
-                        )),
-                        is(array(
                                 equalTo("TestRequirementProcessor.test04"),
+                                equalTo("TC02"),
                                 equalTo("OK"),
                                 equalTo("R05")
-                        )),
+                                )),
                         is(array(
                                 equalTo("TestRequirementProcessor.test05"),
+                                equalTo("TC04"),
                                 equalTo("Missing annotation: @Test."),
                                 equalTo("R01")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test05"),
+                                equalTo("TC04"),
+                                equalTo("Missing annotation: @Test."),
+                                equalTo("R03")
+                                )),
+                        is(array(
+                                equalTo("TestRequirementProcessor.test06"),
+                                equalTo("TC02"),
+                                equalTo("OK"),
+                                equalTo("R99")
                         )),
                         is(array(
-                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("TestRequirementProcessor.test07"),
+                                equalTo("TC02"),
                                 equalTo("OK"),
-                                equalTo("R01")
+                                equalTo("R89")
                         ))
                 )
         );
     }
 
+    @Test
+    /*
+     * This is a real test case. This case checks the generated testcase-report.csv.
+     */
+    public void testReal03() {
+        String reportPath = System.getProperty("reportPath");
+        // The value of this property has to be the same as reportPath compiler argument.
+        assertNotNull(reportPath, "The reportPath system variable must be set.");
+        
+        String fileNameOfTestCasesCsv =  (reportPath.endsWith("/")) ?
+                reportPath + RequirementProcessor.TEST_CASE_REPORT_CSV
+                : reportPath + "/" + RequirementProcessor.TEST_CASE_REPORT_CSV;
+
+        // Reading the generated csv
+        List<String[]> table = readCsv(fileNameOfTestCasesCsv);
+
+        // Checking the size of the csv
+        assertThat(table.size(), greaterThanOrEqualTo(1));
+
+        // First row of the csv
+        assertThat(
+                table.get(0),
+                is(array(
+                        equalTo("TEST CASE ID"),
+                        equalTo("TEST METHOD"),
+                        equalTo("STATUS")
+                ))
+        );
+
+        //Other rows of the csv
+        assertThat(
+                table.subList(1, table.size()),
+                containsInAnyOrder(
+                        is(array(
+                                equalTo(""),
+                                equalTo("TestRequirementProcessor.test00"),
+                                equalTo("Empty string isn't a valid value of a @TestCase annotation.")
+                                )),
+                        is(array(
+                                equalTo(""),
+                                equalTo("TestRequirementProcessor.test01"),
+                                equalTo("Missing annotation: @TestCase.")
+                                )),
+                        is(array(
+                                equalTo("TC01"),
+                                equalTo("TestRequirementProcessor.test02"),
+                                equalTo("OK")
+                                )),
+                        is(array(
+                                equalTo("TC03"),
+                                equalTo("TestRequirementProcessor.test03"),
+                                equalTo("OK")
+                                )),
+                        is(array(
+                                equalTo("TC02"),
+                                equalTo("TestRequirementProcessor.test04"),
+                                equalTo("Test case id isn't unique. It is used by TestRequirementProcessor.test06, TestRequirementProcessor.test07")
+                                )),
+                        is(array(
+                                equalTo("TC04"),
+                                equalTo("TestRequirementProcessor.test05"),
+                                equalTo("OK")
+                                )),
+                        is(array(
+                                equalTo("TC02"),
+                                equalTo("TestRequirementProcessor.test06"),
+                                equalTo("Test case id isn't unique. It is used by TestRequirementProcessor.test04, TestRequirementProcessor.test07")
+                        )),
+                        is(array(
+                                equalTo("TC02"),
+                                equalTo("TestRequirementProcessor.test07"),
+                                equalTo("Test case id isn't unique. It is used by TestRequirementProcessor.test04, TestRequirementProcessor.test06")
+                        ))
+                )
+        );
+    }
+    
     private List<String[]> readCsv(String filePath) {
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
