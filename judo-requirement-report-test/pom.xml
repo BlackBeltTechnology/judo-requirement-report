@@ -36,7 +36,7 @@
                     <version>3.10.1</version>
                     <configuration>
                         <compilerArgs>
-                            <arg>-AreportPath=${project.basedir}/target/classes/requirements-report.csv</arg>
+                            <arg>-AreportPath=${project.basedir}/target/classes</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
@@ -45,7 +45,7 @@
                     <configuration>
                         <systemPropertyVariables>
                             <!-- The value of this property has to be the same as reportPath compiler argument. -->
-                            <reportPath>${project.basedir}/target/classes/requirements-report.csv</reportPath>
+                            <reportPath>${project.basedir}/target/classes</reportPath>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
