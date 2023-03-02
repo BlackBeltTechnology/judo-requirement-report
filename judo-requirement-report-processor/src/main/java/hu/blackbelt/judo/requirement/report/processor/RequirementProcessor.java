@@ -150,7 +150,7 @@ public class RequirementProcessor extends AbstractProcessor {
     }
     
     private void writeTestCases(File file, Stream<AnnotatedElement> elements) {
-        chkDirectory(file);
+        checkDirectory(file);
         
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
@@ -172,7 +172,7 @@ public class RequirementProcessor extends AbstractProcessor {
     }
 
     private void writeRequirementReportCsv(File file, Stream<RequirementReportRow> elements) {
-        chkDirectory(file);
+        checkDirectory(file);
 
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
@@ -193,7 +193,7 @@ public class RequirementProcessor extends AbstractProcessor {
         }
     }
 
-    private void chkDirectory(File file) {
+    private void checkDirectory(File file) {
         try {
             file.getParentFile().mkdirs();
         } catch (Exception e) {

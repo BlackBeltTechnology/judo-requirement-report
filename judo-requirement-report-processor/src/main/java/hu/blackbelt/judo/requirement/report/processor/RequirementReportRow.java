@@ -1,5 +1,7 @@
 package hu.blackbelt.judo.requirement.report.processor;
 
+import java.util.Objects;
+
 /**
  * This class represent a row in the requirement-report.csv. 
  *
@@ -18,6 +20,6 @@ class RequirementReportRow {
     }
 
     String[] toRequirementReportRowStringArray() {
-        return new String[]{testMethod, testCaseId, status, (reqId == null ? "" : reqId)};
+        return new String[]{testMethod, testCaseId, status, Objects.requireNonNullElse(reqId,"")};
     }
 }

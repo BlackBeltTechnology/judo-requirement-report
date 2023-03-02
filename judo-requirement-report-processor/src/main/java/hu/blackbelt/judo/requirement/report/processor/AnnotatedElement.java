@@ -90,7 +90,7 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
     public void addResultStringForTestCaseReport(String resultStringForTestCaseReport) {
         this.resultStringForTestCaseReport = (this.resultStringForTestCaseReport.equals("OK")) ?
                 resultStringForTestCaseReport
-                : this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport;
+                : (this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport);
     }
     
     public Collection<RequirementReportRow> collectReqForElement() {

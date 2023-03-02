@@ -241,8 +241,8 @@ public class TestRequirementProcessor {
         assertNotNull(reportPath, "The reportPath system variable must be set.");
         
         String fileNameOfReqReportCsv = (reportPath.endsWith("/")) ?
-                reportPath + RequirementProcessor.REQUIREMENT_REPORT_CSV
-                : reportPath + "/" + RequirementProcessor.REQUIREMENT_REPORT_CSV;
+                (reportPath + RequirementProcessor.REQUIREMENT_REPORT_CSV)
+                : (reportPath + "/" + RequirementProcessor.REQUIREMENT_REPORT_CSV);
         
         // Reading the generated csv
         List<String[]> table = readCsv(fileNameOfReqReportCsv);
@@ -351,8 +351,8 @@ public class TestRequirementProcessor {
         assertNotNull(reportPath, "The reportPath system variable must be set.");
         
         String fileNameOfTestCasesCsv =  (reportPath.endsWith("/")) ?
-                reportPath + RequirementProcessor.TEST_CASE_REPORT_CSV
-                : reportPath + "/" + RequirementProcessor.TEST_CASE_REPORT_CSV;
+                (reportPath + RequirementProcessor.TEST_CASE_REPORT_CSV)
+                : (reportPath + "/" + RequirementProcessor.TEST_CASE_REPORT_CSV);
 
         // Reading the generated csv
         List<String[]> table = readCsv(fileNameOfTestCasesCsv);
