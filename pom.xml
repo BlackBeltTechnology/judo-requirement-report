@@ -797,6 +797,9 @@
                                 <phase>process-sources</phase>
                                 <configuration>
                                     <licenseName>epl_v2</licenseName>
+									<excludes>
+										<exclude>**/*.json</exclude>
+									</excludes>
                                 </configuration>
                             </execution>
                             <execution>
