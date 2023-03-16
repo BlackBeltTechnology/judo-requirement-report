@@ -1,5 +1,25 @@
 package hu.blackbelt.judo.requirement.report.processor;
 
+/*-
+ * #%L
+ * JUDO Requirement :: Report :: Processor
+ * %%
+ * Copyright (C) 2018 - 2023 BlackBelt Technology
+ * %%
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is
+ * available at https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ * #L%
+ */
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -21,14 +41,14 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
     private Requirement reqAnnotation;
     private String resultStringForRequirementReport;
     private String resultStringForTestCaseReport;
-    
+
     public AnnotatedElement(Element element) {
         TestCase testCaseAnnotation = element.getAnnotation(TestCase.class);
         this.elementName = element.getEnclosingElement().getSimpleName() + "." + element.getSimpleName();
         this.reqAnnotation = element.getAnnotation(Requirement.class);
         this.isTestAnnotation = (element.getAnnotation(Test.class) != null) ? true : false;
         this.isTestCaseAnnotation = (testCaseAnnotation != null) ? true : false;
-        
+
         if (this.isTestCaseAnnotation) {
             if (testCaseAnnotation.value() != null) {
                 this.testCaseId = testCaseAnnotation.value();
@@ -41,7 +61,7 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
             this.testCaseId = "";
             this.resultStringForTestCaseReport = "Missing annotation: @TestCase.";
         }
-        
+
         if ( reqAnnotation != null
                 && reqAnnotation.reqs().length > 0
                 && isTestAnnotation
@@ -66,11 +86,11 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
         }
 
     }
-    
+
     public String getElementName() {
         return elementName;
     }
-    
+
     public String getTestCaseId() {
         return testCaseId;
     }
@@ -86,13 +106,13 @@ class AnnotatedElement implements Comparable<AnnotatedElement>  {
         }
         return result;
     }
-    
+
     public void addResultStringForTestCaseReport(String resultStringForTestCaseReport) {
         this.resultStringForTestCaseReport = (this.resultStringForTestCaseReport.equals("OK")) ?
                 resultStringForTestCaseReport
                 : (this.resultStringForTestCaseReport + " " + resultStringForTestCaseReport);
     }
-    
+
     public Collection<RequirementReportRow> collectReqForElement() {
         return Arrays.stream(
                     (this.reqAnnotation.reqs() == null || this.reqAnnotation.reqs().length == 0) ?
