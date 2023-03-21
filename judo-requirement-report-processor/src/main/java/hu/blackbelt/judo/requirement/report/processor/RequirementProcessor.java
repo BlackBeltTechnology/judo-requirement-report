@@ -9,13 +9,13 @@ package hu.blackbelt.judo.requirement.report.processor;
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- * 
+ *
  * This Source Code may also be made available under the following Secondary
  * Licenses when the conditions for such availability set forth in the Eclipse
  * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
  * with the GNU Classpath Exception which is
  * available at https://www.gnu.org/software/classpath/license.html.
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
@@ -55,7 +55,7 @@ public class RequirementProcessor extends AbstractProcessor {
 
     public static final String REQUIREMENT_REPORT_CSV = "requirements-report.csv";
     public static final String TEST_CASE_REPORT_CSV = "testcases-report.csv";
-            
+
     public RequirementProcessor(){}
 
     @Override
@@ -64,10 +64,10 @@ public class RequirementProcessor extends AbstractProcessor {
         if (reportPath == null || reportPath.isBlank()) {
             throw new RuntimeException(ERROR_MSG_NO_REPORT_PATH);
         }
-        
+
         String fileNameOfReqReportCsv = null;
         String fileNameOfTestCasesCsv = null;
-        
+
         if (reportPath.endsWith("/")) {
             fileNameOfReqReportCsv = reportPath + REQUIREMENT_REPORT_CSV;
             fileNameOfTestCasesCsv = reportPath + TEST_CASE_REPORT_CSV;
@@ -84,7 +84,7 @@ public class RequirementProcessor extends AbstractProcessor {
         if (annotations.isEmpty()) {
             return false;
         }
-        
+
         // Annotation[] -> Element[] -> AnnotatedElement[]
         List<AnnotatedElement> annotatedMethods = annotations.stream()
                 .flatMap(a -> roundEnv.getElementsAnnotatedWith(a).stream())
@@ -94,7 +94,7 @@ public class RequirementProcessor extends AbstractProcessor {
                 // sort by test case id
                 .sorted()
                 .collect(Collectors.toList());
-                
+
         // check ids of all test case are unique
         AnnotatedElement prevAe = null;
         Set<AnnotatedElement> wrongTCs= new HashSet<AnnotatedElement>();
@@ -123,14 +123,14 @@ public class RequirementProcessor extends AbstractProcessor {
                                                 .collect(Collectors.joining(", "))
                                 )
                         );
-                    
+
                     // clear the wrongTCs
                     wrongTCs.clear();
                 }
             }
             prevAe = ae;
         }
-        
+
         // create the list of test-cases
         writeTestCases(new File(fileNameOfTestCasesCsv), annotatedMethods.stream());
 
@@ -148,10 +148,10 @@ public class RequirementProcessor extends AbstractProcessor {
         );
         return false;
     }
-    
+
     private void writeTestCases(File file, Stream<AnnotatedElement> elements) {
         checkDirectory(file);
-        
+
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
                 .withIgnoreQuotations(true)
@@ -163,7 +163,7 @@ public class RequirementProcessor extends AbstractProcessor {
         ) {
             // file header
             out.writeNext(new String[]{"TEST CASE ID", "TEST METHOD", "STATUS"});
-            
+
             // write rows
             elements.forEach(i -> out.writeNext(i.toTestCaseRowStringArray()));
         } catch (IOException e) {
@@ -185,7 +185,7 @@ public class RequirementProcessor extends AbstractProcessor {
         ) {
             // file header
             out.writeNext(new String[]{"TEST METHOD","TEST CASE ID","STATUS","REQUIREMENT"});
-            
+
             // write rows
             elements.forEach(i -> out.writeNext(i.toRequirementReportRowStringArray()));
         } catch (IOException e) {

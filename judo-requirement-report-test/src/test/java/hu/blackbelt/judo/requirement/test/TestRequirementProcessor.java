@@ -9,13 +9,13 @@ package hu.blackbelt.judo.requirement.test;
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0.
- * 
+ *
  * This Source Code may also be made available under the following Secondary
  * Licenses when the conditions for such availability set forth in the Eclipse
  * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
  * with the GNU Classpath Exception which is
  * available at https://www.gnu.org/software/classpath/license.html.
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  * #L%
  */
@@ -119,7 +119,7 @@ public class TestRequirementProcessor {
     public void test06() {
         assertTrue(true);
     }
-    
+
     @Requirement(reqs = {
             "R89"
     })
@@ -239,11 +239,11 @@ public class TestRequirementProcessor {
         String reportPath = System.getProperty("reportPath");
         // The value of this property has to be the same as reportPath compiler argument.
         assertNotNull(reportPath, "The reportPath system variable must be set.");
-        
+
         String fileNameOfReqReportCsv = (reportPath.endsWith("/")) ?
                 (reportPath + RequirementProcessor.REQUIREMENT_REPORT_CSV)
                 : (reportPath + "/" + RequirementProcessor.REQUIREMENT_REPORT_CSV);
-        
+
         // Reading the generated csv
         List<String[]> table = readCsv(fileNameOfReqReportCsv);
 
@@ -349,7 +349,7 @@ public class TestRequirementProcessor {
         String reportPath = System.getProperty("reportPath");
         // The value of this property has to be the same as reportPath compiler argument.
         assertNotNull(reportPath, "The reportPath system variable must be set.");
-        
+
         String fileNameOfTestCasesCsv =  (reportPath.endsWith("/")) ?
                 (reportPath + RequirementProcessor.TEST_CASE_REPORT_CSV)
                 : (reportPath + "/" + RequirementProcessor.TEST_CASE_REPORT_CSV);
@@ -417,7 +417,7 @@ public class TestRequirementProcessor {
                 )
         );
     }
-    
+
     private List<String[]> readCsv(String filePath) {
         CSVParser parser = new CSVParserBuilder()
                 .withSeparator(';')
