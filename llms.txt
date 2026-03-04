@@ -23,6 +23,11 @@ Key facts:
 - [judo-requirement-report-processor/pom.xml](judo-requirement-report-processor/pom.xml): Annotation processor that discovers, validates, and generates CSV traceability reports at compile time
 - [judo-requirement-report-test/pom.xml](judo-requirement-report-test/pom.xml): End-to-end tests — annotated methods serve as processor input, JUnit tests verify CSV output
 
+## Used by
+
+- [judo-meta-jsl](../../models/judo-meta-jsl): models/judo-meta-jsl
+- [judo-runtime-core-jsl](../../runtime/judo-runtime-core-jsl): runtime/judo-runtime-core-jsl
+
 ## Optional
 
 - [.github/workflows/build.yml](.github/workflows/build.yml): CI/CD build pipeline (GitHub Actions)
