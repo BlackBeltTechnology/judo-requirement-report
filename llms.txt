@@ -1,0 +1,35 @@
+# judo-requirement-report
+
+> A Java compile-time annotation processor that extracts requirement and test-case metadata from annotated test methods and generates CSV traceability reports.
+
+Key facts:
+- Java 21, Maven 3.9.4 multi-module project (3 modules)
+- Provides `@Requirement` and `@TestCase` annotations with SOURCE retention (zero runtime footprint)
+- Generates semicolon-separated CSV reports (`requirements-report.csv`, `testcases-report.csv`) during compilation
+- Uses Google Auto Service for processor registration, OpenCSV for CSV generation
+- Part of the [judo-community](https://github.com/BlackBeltTechnology/judo-community) ecosystem
+- License: Eclipse Public License 2.0 (EPL-2.0)
+
+## Docs
+
+- [README.md](README.md): Project overview, module structure, quick start, and usage examples
+- [AGENTS.md](AGENTS.md): Developer guide with build commands, directory structure, and coding conventions
+- [CONTRIBUTING.md](CONTRIBUTING.md): Development setup and contribution guidelines
+- [.github/CIFLOW.md](.github/CIFLOW.md): Detailed CI/CD workflow with Mermaid diagrams
+
+## Modules
+
+- [judo-requirement-report-annotation/pom.xml](judo-requirement-report-annotation/pom.xml): Defines `@Requirement` and `@TestCase` annotations with SOURCE retention
+- [judo-requirement-report-processor/pom.xml](judo-requirement-report-processor/pom.xml): Annotation processor that discovers, validates, and generates CSV traceability reports at compile time
+- [judo-requirement-report-test/pom.xml](judo-requirement-report-test/pom.xml): End-to-end tests — annotated methods serve as processor input, JUnit tests verify CSV output
+
+## Used by
+
+- [judo-meta-jsl](../../models/judo-meta-jsl): models/judo-meta-jsl
+- [judo-runtime-core-jsl](../../runtime/judo-runtime-core-jsl): runtime/judo-runtime-core-jsl
+
+## Optional
+
+- [.github/workflows/build.yml](.github/workflows/build.yml): CI/CD build pipeline (GitHub Actions)
+- [LICENSE.txt](LICENSE.txt): Eclipse Public License 2.0 license text
+- [pom.xml](pom.xml): Parent POM with shared dependencies, plugin management, and profiles
