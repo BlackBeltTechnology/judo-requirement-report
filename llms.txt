@@ -25,8 +25,8 @@ Key facts:
 
 ## Used by
 
-- [judo-meta-jsl](../../models/judo-meta-jsl): models/judo-meta-jsl
-- [judo-runtime-core-jsl](../../runtime/judo-runtime-core-jsl): runtime/judo-runtime-core-jsl
+- [judo-meta-jsl](../../models/judo-meta-jsl): JSL language toolchain — grammar, parser, validator, code generator, and LSP servers
+- [judo-runtime-core-jsl](../../runtime/judo-runtime-core-jsl): JSL support for runtime core — model parsing through to DAOs and schema
 
 ## Optional
 
